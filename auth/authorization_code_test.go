@@ -115,6 +115,16 @@ func TestAuthorize(t *testing.T) {
 	}
 }
 
+func TestResourceMetadataURLFromChallengesIgnoresNonBearer(t *testing.T) {
+	challenges := []oauthex.Challenge{
+		{Scheme: "basic", Params: map[string]string{"resource_metadata": "https://basic.example/metadata"}},
+		{Scheme: "bearer", Params: map[string]string{"resource_metadata": "https://mcp.example/metadata"}},
+	}
+	if got, want := resourceMetadataURLFromChallenges(challenges), "https://mcp.example/metadata"; got != want {
+		t.Fatalf("resourceMetadataURLFromChallenges() = %q, want %q", got, want)
+	}
+}
+
 // TestAuthorize_RefreshAfterContextCancel verifies that the token source built
 // by Authorize keeps refreshing after the context passed to Authorize is
 // cancelled. The token source is stored on the handler and used by the
